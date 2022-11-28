@@ -5,10 +5,6 @@ from .mt64 import mt64
 def new_key(seed: int) -> bytes:
     mt = mt64()
     mt.seed(seed)
-
-    mt.seed(mt.int64())
-    mt.int64()
-
     return bytes(byte for _ in range(512) for byte in mt.int64().to_bytes(8, "big"))
 
 def xor(data: bytes, key: bytes) -> bytes:
