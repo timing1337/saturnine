@@ -1,6 +1,7 @@
 from __future__ import annotations
 import threading
 import enet
+from game_server.game.player import Player
 from game_server.protocol.packet import Packet
 from game_server.protocol.cmd_id import CmdID
 from game_server.encryption import xor, mt64
@@ -12,16 +13,15 @@ class Connection:
     gameServer: GameServer
     peer: enet.Peer
     key: bytes
+    player: Player
     
     def __init__(self, gameServer: GameServer, peer: enet.Peer) -> None:
         self.peer = peer
         self.gameServer = gameServer
 
     def handle(self, data: bytes):
-        print(f'{self.peer.address}: Raw data: {data.hex()}')
         if hasattr(self, 'key'): 
             data = xor(data, self.key)
-            print(f'{self.peer.address}: Xored: {data.hex()}')
         packet = Packet()
         packet.parse(data)
         print(f'{self.peer.address}: Received packet: {packet.body} | PacketHead: {packet.head} | Raw: {data.hex()}')
@@ -36,7 +36,6 @@ class Connection:
         self.send_raw(bytes(packet))
 
     def send_raw(self, data: bytes):
-        print(f'{self.peer.address}: Sending raw: {data.hex()}')
         self.peer.send(0, enet.Packet(data))
 
         
