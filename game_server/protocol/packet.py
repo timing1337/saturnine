@@ -15,6 +15,7 @@ class Packet:
             self.head = PacketHead()
 
         self.body = body
+        print(body)
         if body:
             self.cmdid = CmdID[body.__class__.__name__]
 
