@@ -12,11 +12,11 @@ class AvatarEntity(Entity):
         self.entity_id = world.get_next_entity_id(ProtEntityType.PROT_ENTITY_AVATAR)
         self.guid = avatar_info.guid
         self.scene_weapon_info = SceneWeaponInfo()
-        self.scene_weapon_info.entity_id = world.get_next_entity_id(ProtEntityType.PROT_ENTITY_WEAPON)
+        self.scene_weapon_info.entity_id = world.get_next_entity_id(ProtEntityType.PROT_ENTITY_GADGET)
         self.scene_weapon_info.item_id = 11406
         self.scene_weapon_info.level = 90
         self.scene_weapon_info.promote_level = 6
-        self.scene_weapon_info.gadget_id = world.get_next_entity_id(ProtEntityType.PROT_ENTITY_GADGET)
+        self.scene_weapon_info.gadget_id = 50011406
         super().__init__(world, motion, rotation, speed)
 
     def get_scene_entity_info(self, uid: int):

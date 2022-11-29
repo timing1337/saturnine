@@ -1,6 +1,6 @@
 from game_server.protocol.cmd_id import CmdID
 from game_server import HandlerRouter,Connection
-from lib.proto import TeamEnterSceneInfo, EnterSceneDoneReq, EnterWorldAreaReq,PathfindingEnterSceneReq,PathfindingEnterSceneRsp, EnterWorldAreaRsp, ScenePlayerLocationNotify, PlayerLocationInfo, VisionType, SceneEntityAppearNotify, SceneTeamAvatar, MpDisplayCurAvatar,AvatarEnterSceneInfo, SceneTeamUpdateNotify, ProtEntityType, AbilitySyncStateInfo, MpLevelEntityInfo,EnterSceneReadyReq,EnterScenePeerNotify,SceneInitFinishReq,MpSettingType,WorldDataNotify,PropValue,HostPlayerNotify,PlayerGameTimeNotify,SceneTimeNotify,SceneDataNotify,WorldPlayerInfoNotify,OnlinePlayerInfo,ScenePlayerInfoNotify,ScenePlayerInfo,PlayerEnterSceneInfoNotify,SceneInitFinishRsp,GetScenePointReq, GetSceneAreaReq,GetScenePointRsp,GetSceneAreaRsp,SceneForceUnlockNotify,SceneInitFinishRsp
+from lib.proto import TeamEnterSceneInfo, EnterSceneDoneReq, EnterWorldAreaReq,PathfindingEnterSceneReq,PathfindingEnterSceneRsp, EnterWorldAreaRsp, ScenePlayerLocationNotify, PlayerLocationInfo, VisionType, SceneEntityAppearNotify, SceneTeamAvatar, MpDisplayCurAvatar,AvatarEnterSceneInfo, SceneTeamUpdateNotify, ProtEntityType, AbilitySyncStateInfo, MpLevelEntityInfo,EnterSceneReadyReq,EnterScenePeerNotify,SceneInitFinishReq,MpSettingType,WorldDataNotify,PropValue,HostPlayerNotify,PlayerGameTimeNotify,SceneTimeNotify,SceneDataNotify,WorldPlayerInfoNotify,OnlinePlayerInfo,ScenePlayerInfoNotify,ScenePlayerInfo,PlayerEnterSceneInfoNotify,SceneInitFinishRsp,GetScenePointReq, GetSceneAreaReq,GetScenePointRsp,GetSceneAreaRsp,SceneForceUnlockNotify,SceneInitFinishRsp,EnterSceneDoneRsp,EnterType,PostEnterSceneReq,PostEnterSceneRsp
 from lib.retcode import Retcode
 from game_server.protocol.reader import BinaryReader
 from game_server.resource.enums import PropType
@@ -68,6 +68,9 @@ def handle_scene_init(conn: Connection, msg: SceneInitFinishReq):
     cur_avatar = conn.player.get_cur_avatar()
     scene_team_update_notify = SceneTeamUpdateNotify(scene_team_avatar_list=[], display_cur_avatar_list=[], is_in_mp=False)
     enter_scene_info_notify = PlayerEnterSceneInfoNotify()
+    enter_scene_info_notify.scene_id = conn.player.scene_id
+    enter_scene_info_notify.type = EnterType.ENTER_SELF
+    enter_scene_info_notify.target_uid = conn.player.uid
     enter_scene_info_notify.cur_avatar_entity_id = cur_avatar.entity_id
     enter_scene_info_notify.team_enter_info = TeamEnterSceneInfo(team_entity_id=conn.player.world.get_next_entity_id(ProtEntityType.PROT_ENTITY_TEAM), team_ability_info=AbilitySyncStateInfo())
     enter_scene_info_notify.mp_level_entity_info = MpLevelEntityInfo(entity_id=conn.player.world.get_next_entity_id(ProtEntityType.PROT_ENTITY_MP_LEVEL), authority_peer_id=1, ability_info=AbilitySyncStateInfo())
@@ -138,6 +141,8 @@ def handle_scene_done(conn: Connection, msg: EnterSceneDoneReq):
     conn.send(scene_entity_appear_notify)
     conn.send(scene_player_location_notify)
 
+    conn.send(EnterSceneDoneRsp())
+
 
 @router(CmdID.EnterWorldAreaReq)
 def handle_enter_world(conn: Connection, msg: EnterWorldAreaReq):
@@ -145,3 +150,10 @@ def handle_enter_world(conn: Connection, msg: EnterWorldAreaReq):
     rsp.area_id = msg.area_id
     rsp.area_type = msg.area_type
     conn.send(rsp)
+
+@router(CmdID.PostEnterSceneReq)
+def post_enter(conn: Connection, msg: PostEnterSceneReq):
+    rsp = PostEnterSceneRsp()
+    rsp.enter_scene_token = msg.enter_scene_token
+    conn.send(rsp)
+
