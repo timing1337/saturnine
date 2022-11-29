@@ -45,7 +45,7 @@ class Player:
         traveler = AvatarInfo()
         traveler.avatar_id = 10000005
         traveler.avatar_type = AvatarType.AVATAR_TYPE_FORMAL
-        traveler.skill_depot_id = 2601
+        traveler.skill_depot_id = 504
         traveler.talent_id_list = []
         traveler.prop_map = {
             PropType.PROP_LEVEL._value_: PropValue(type=PropType.PROP_LEVEL._value_, val=90, ival=90),

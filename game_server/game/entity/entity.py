@@ -12,7 +12,7 @@ class Entity(object):
     guid: int
     motion_state: MotionState = MotionState.MOTION_STANDBY
 
-    def __init__(self, world: World, motion: Vector, rotation: Vector = Vector(0, 0, 0), speed: Vector = Vector(0, 0, 0)) -> None:
+    def __init__(self, world: World, motion: Vector = Vector(0, 400, 0), rotation: Vector = Vector(0, 0, 0), speed: Vector = Vector(0, 0, 0)) -> None:
         self.world = world
         self.motion = motion
         self.rotation = rotation
