@@ -1,7 +1,8 @@
 from game_server.protocol.cmd_id import CmdID
 from game_server import HandlerRouter,Connection
-from lib.proto import EnterSceneReadyReq,EnterScenePeerNotify,SceneInitFinishReq,SceneInitFinishRsp,WorldDataNotify,PropValue,HostPlayerNotify,PlayerGameTimeNotify,SceneTimeNotify,SceneDataNotify,WorldPlayerInfoNotify,OnlinePlayerInfo,ScenePlayerInfoNotify,ScenePlayerInfo,PlayerEnterSceneInfoNotify,SceneInitFinishRsp,GetScenePointReq, GetSceneAreaReq,GetScenePointRsp,GetSceneAreaRsp
+from lib.proto import TeamEnterSceneInfo, SceneTeamUpdateNotify, ProtEntityType, AbilitySyncStateInfo, MpLevelEntityInfo,EnterSceneReadyReq,EnterScenePeerNotify,SceneInitFinishReq,MpSettingType,WorldDataNotify,PropValue,HostPlayerNotify,PlayerGameTimeNotify,SceneTimeNotify,SceneDataNotify,WorldPlayerInfoNotify,OnlinePlayerInfo,ScenePlayerInfoNotify,ScenePlayerInfo,PlayerEnterSceneInfoNotify,SceneInitFinishRsp,GetScenePointReq, GetSceneAreaReq,GetScenePointRsp,GetSceneAreaRsp,SceneForceUnlockNotify,SceneInitFinishRsp
 from lib.retcode import Retcode
+from game_server.resource.enums import PropType
 import enet
 
 router = HandlerRouter()
@@ -17,7 +18,15 @@ def handle_scene_ready(conn: Connection, msg: EnterSceneReadyReq):
 @router(CmdID.SceneInitFinishReq)
 def handle_scene_init(conn: Connection, msg: SceneInitFinishReq):
 
-    online_player_info = OnlinePlayerInfo(uid=conn.player.uid, nickname=conn.player.name)
+    online_player_info = OnlinePlayerInfo(
+        uid=conn.player.uid, 
+        nickname=conn.player.name, 
+        player_level=conn.player.prop_map[PropType.PROP_PLAYER_LEVEL],
+        avatar_id=conn.player.avatar_id,
+        mp_setting_type=MpSettingType.MP_SETTING_NO_ENTER,
+        cur_player_num_in_world=1,
+        world_level=8
+    )
 
     world_data_notify = WorldDataNotify()
     world_data_notify.world_prop_map = {
@@ -46,10 +55,20 @@ def handle_scene_init(conn: Connection, msg: SceneInitFinishReq):
     world_player_info_notify.player_uid_list = [conn.player.uid]
 
     scene_player_info_notify = ScenePlayerInfoNotify()
-    scene_player_info_notify.player_info_list = [ScenePlayerInfo(conn.player.uid, 1, conn.player.name, True, conn.player.scene_id, online_player_info)]
+    scene_player_info_notify.player_info_list = [ScenePlayerInfo(
+        uid=conn.player.uid, 
+        peer_id=1,
+        name=conn.player.name,
+        is_connected=True,
+        scene_id=conn.player.scene_id,
+        online_player_info=online_player_info
+    )]
 
+    scene_team_update_notify = SceneTeamUpdateNotify(scene_team_avatar_list=[], display_cur_avatar_list=[], is_in_mp=False)
     enter_scene_info_notify = PlayerEnterSceneInfoNotify()
     enter_scene_info_notify.cur_avatar_entity_id = 1
+    enter_scene_info_notify.team_enter_info = TeamEnterSceneInfo(team_entity_id=conn.player.world.get_next_entity_id(ProtEntityType.PROT_ENTITY_TEAM), team_ability_info=AbilitySyncStateInfo())
+    enter_scene_info_notify.mp_level_entity_info = MpLevelEntityInfo(entity_id=conn.player.world.get_next_entity_id(ProtEntityType.PROT_ENTITY_MP_LEVEL), authority_peer_id=1, ability_info=AbilitySyncStateInfo())
 
     conn.send(world_data_notify)
     conn.send(host_player_notify)

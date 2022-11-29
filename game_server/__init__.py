@@ -26,7 +26,7 @@ class Connection:
         packet = Packet()
         packet.parse(data)
 
-        logger.opt(colors=True).debug(f'<yellow>{self.peer.address}</yellow> Receive: <cyan>{packet.body}</cyan> | Raw: <green>{data.hex()}</green>')
+        logger.opt(colors=True).debug(f'<yellow>{self.peer.address}</yellow> Receive: <cyan>{packet.body}</cyan>')
         if handler := self.game_server.router.get(packet.cmdid):
             handler(self, packet.body)
 
