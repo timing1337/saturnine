@@ -5,32 +5,34 @@ from game_server.game.player import Player
 from game_server.protocol.packet import Packet
 from game_server.protocol.cmd_id import CmdID
 from game_server.encryption import xor, mt64
+from game_server.resource import ResourceManager
 from typing import Callable
 import betterproto
+from loguru import logger
 
 class Connection: 
-
-    gameServer: GameServer
+    game_server: GameServer
     peer: enet.Peer
     key: bytes
     player: Player
     
-    def __init__(self, gameServer: GameServer, peer: enet.Peer) -> None:
+    def __init__(self, game_server: GameServer, peer: enet.Peer) -> None:
         self.peer = peer
-        self.gameServer = gameServer
+        self.game_server = game_server
 
     def handle(self, data: bytes):
         if hasattr(self, 'key'): 
             data = xor(data, self.key)
         packet = Packet()
         packet.parse(data)
-        print(f'{self.peer.address}: Received packet: {packet.body} | PacketHead: {packet.head} | Raw: {data.hex()}')
-        if handler := self.gameServer.router.get(packet.cmdid):
+
+        logger.opt(colors=True).debug(f'<yellow>{self.peer.address}</yellow> Receive: <cyan>{packet.body}</cyan> | Raw: <green>{data.hex()}</green>')
+        if handler := self.game_server.router.get(packet.cmdid):
             handler(self, packet.body)
 
     def send(self, msg: betterproto.Message):
         packet = bytes(Packet(body=msg))
-        print(f'{self.peer.address}: Sending packet: {msg}')
+        logger.opt(colors=True).debug(f'<yellow>{self.peer.address}</yellow> Send: <cyan>{msg}</cyan>')
         if hasattr(self, 'key'): 
             packet = xor(packet, self.key)
         self.send_raw(bytes(packet))
@@ -60,14 +62,15 @@ class HandlerRouter:
         return wrapper
 
 class GameServer:
-
     router: HandlerRouter = HandlerRouter()
     conns: dict[str, Connection] = {}
+    resources: ResourceManager
     
     def __init__(self, host, port) -> None:
         self.host = enet.Host(enet.Address(host, port), 10, 0, 0, 0)
         self.host.checksum = enet.ENET_CRC32
         self.host.compress_with_range_coder()
+        self.resources = ResourceManager("server_data")
 
     def add(self, router: HandlerRouter):
         self.router.add(router)
@@ -86,5 +89,5 @@ class GameServer:
                     conn.handle(msg)
 
     def start(self):
-        b = threading.Thread(name='gameserver', target=self.loop)
+        b = threading.Thread(name='GameServer', target=self.loop)
         b.start()

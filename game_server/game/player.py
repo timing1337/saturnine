@@ -1,16 +1,14 @@
 from lib.proto import Vector,EnterType,PlayerEnterSceneNotify
 from game_server.utils.time import current_milli_time
+import dataclasses
 
+@dataclasses.dataclass()
 class Player:
     uid: int
     name: str
 
-    scene_id: int
-    pos: Vector
-
-    def __init__(self, uid: int, name: str) -> None:
-        self.uid = uid
-        self.name = name
+    scene_id: int = 0
+    pos: Vector = dataclasses.field(default_factory=Vector)
 
     def get_teleport_packet(self, scene_id: int, pos: Vector, enter_type: EnterType = EnterType.ENTER_SELF):
         player_enter_scene_notify = PlayerEnterSceneNotify()
