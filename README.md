@@ -8,9 +8,9 @@ a work in progress cbt2 server
 
 2. Install enet
 
-    Clone the repo recursively
+    Clone the repo recursively and move to that directory (remember to install pyenet dependencies which include Cython)
   
-    ```git clone https://github.com/lilmayofuksu/pyenet --recursive```
+    ```git clone https://github.com/lilmayofuksu/pyenet --recursive && cd pyenet```
   
     Run the setup.py build
   
