@@ -15,9 +15,9 @@ class Packet:
             self.head = PacketHead()
 
         self.body = body
-        print(body)
         if body:
             self.cmdid = CmdID[body.__class__.__name__]
+            self.head.packet_id = self.cmdid
 
     def parse(self, data: bytes) -> Packet:
         buf = BinaryReader(data)

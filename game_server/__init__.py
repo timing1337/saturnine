@@ -33,11 +33,12 @@ class Connection:
     def send(self, msg: betterproto.Message):
         packet = bytes(Packet(body=msg))
         logger.opt(colors=True).debug(f'<yellow>{self.peer.address}</yellow> Send: <cyan>{msg}</cyan>')
-        if hasattr(self, 'key'): 
-            packet = xor(packet, self.key)
         self.send_raw(bytes(packet))
 
     def send_raw(self, data: bytes):
+        if hasattr(self, 'key'): 
+            data = xor(data, self.key)
+        logger.opt(colors=True).debug(f'<yellow>{self.peer.address}</yellow> Send raw: <cyan>{data.hex()}</cyan>')
         self.peer.send(0, enet.Packet(data))
 
         

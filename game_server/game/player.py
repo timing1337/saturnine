@@ -48,9 +48,9 @@ class Player:
         traveler.skill_depot_id = 504
         traveler.talent_id_list = []
         traveler.prop_map = {
-            PropType.PROP_LEVEL._value_: PropValue(type=PropType.PROP_LEVEL._value_, val=90, ival=90),
+            PropType.PROP_LEVEL._value_: PropValue(type=PropType.PROP_LEVEL._value_, val=80, ival=80),
             PropType.PROP_EXP._value_: PropValue(type=PropType.PROP_EXP._value_, val=0, ival=0),
-            PropType.PROP_BREAK_LEVEL._value_: PropValue(type=PropType.PROP_BREAK_LEVEL._value_, val=6, ival=6),
+            PropType.PROP_BREAK_LEVEL._value_: PropValue(type=PropType.PROP_BREAK_LEVEL._value_, val=4, ival=4),
         }
 
         traveler.fight_prop_map = {
@@ -85,8 +85,7 @@ class Player:
         traveler.equip_guid_list = []
         traveler.proud_skill_extra_level_map = {}
         traveler.inherent_proud_skill_list = []
-        traveler.skill_level_map = {
-        }
+        traveler.skill_level_map = {}
         traveler.life_state = 1
         traveler.core_proud_skill_level = 0
         traveler.guid = self.get_next_guid()

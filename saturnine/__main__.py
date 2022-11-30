@@ -7,5 +7,6 @@ if __name__ == "__main__":
     gameserver.add(auth.router)
     gameserver.add(ping.router)
     gameserver.add(scene.router)
+
     gameserver.start()
     run_http_server('0.0.0.0')
