@@ -3,10 +3,8 @@
 a minimal cbt2 ps
 
 # Installation
-1. Install dependencies
-```pip install -r ./requirements.txt```
 
-2. Install enet
+1. Install enet
 
     Clone the repo recursively and move to that directory (remember to install pyenet dependencies which include Cython)
   
@@ -19,7 +17,9 @@ a minimal cbt2 ps
     Install the new pyenet module
   
     ```python setup.py install```
-  
+2. Install dependencies
+```pip install -r ./requirements.txt```
+
 # Running
 ```py -m saturnine``` would do the trick
 
