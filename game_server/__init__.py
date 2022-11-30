@@ -38,7 +38,6 @@ class Connection:
     def send_raw(self, data: bytes):
         if hasattr(self, 'key'): 
             data = xor(data, self.key)
-        logger.opt(colors=True).debug(f'<yellow>{self.peer.address}</yellow> Send raw: <cyan>{data.hex()}</cyan>')
         self.peer.send(0, enet.Packet(data))
 
         
@@ -65,13 +64,11 @@ class HandlerRouter:
 class GameServer:
     router: HandlerRouter = HandlerRouter()
     conns: dict[str, Connection] = {}
-    resources: ResourceManager
     
     def __init__(self, host, port) -> None:
         self.host = enet.Host(enet.Address(host, port), 10, 0, 0, 0)
         self.host.checksum = enet.ENET_CRC32
         self.host.compress_with_range_coder()
-        self.resources = ResourceManager("server_data")
 
     def add(self, router: HandlerRouter):
         self.router.add(router)

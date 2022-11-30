@@ -9,3 +9,5 @@ class ResourceManager:
             self.excels = ExcelOutput.load_all_excels(dir)
         else:
             logger.opt(colors=True).debug(f'Resources directory <red>does not exist</red>, running with <yellow>minimal resources</yellow>')
+            
+resources: ResourceManager = ResourceManager("server_data")

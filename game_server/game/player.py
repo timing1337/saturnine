@@ -4,6 +4,7 @@ from game_server.resource.enums import PropType
 from game_server.game.world import World
 from game_server.game.entity.avatar import AvatarEntity
 from game_server.resource.enums import PropType, FightProp
+from game_server.resource import resources
 import dataclasses
 
 @dataclasses.dataclass()
@@ -92,13 +93,76 @@ class Player:
         self.avatars.append(AvatarEntity(self.world, traveler, self.pos))
         self.teams[self.cur_avatar_team_id].avatar_guid_list.append(traveler.guid)
         self.cur_avatar_guid = traveler.guid
+        self.add_all_avatars()
     
+    def add_all_avatars(self):
+        for avatar_id, avatar_data in resources.excels.avatar_datas.items():
+            print(avatar_id)
+            print(avatar_data)
+            if avatar_id == 10000005:
+                continue
+            skill_depot = resources.excels.avatar_skill_depot_datas[avatar_data.skill_depot_id]
+            print(skill_depot)
+            talents = skill_depot.talent_groups
+            talents.append(skill_depot.leader_talent)
+            avatar = AvatarInfo()
+            avatar.avatar_id = int(avatar_id)
+            avatar.avatar_type = AvatarType.AVATAR_TYPE_FORMAL
+            avatar.skill_depot_id = int(avatar_data.skill_depot_id)
+            avatar.talent_id_list = []
+            avatar.prop_map = {
+                PropType.PROP_LEVEL._value_: PropValue(type=PropType.PROP_LEVEL._value_, val=80, ival=80),
+                PropType.PROP_EXP._value_: PropValue(type=PropType.PROP_EXP._value_, val=0, ival=0),
+                PropType.PROP_BREAK_LEVEL._value_: PropValue(type=PropType.PROP_BREAK_LEVEL._value_, val=4, ival=4),
+            }
+            avatar.fight_prop_map = {
+                    FightProp.FIGHT_PROP_BASE_HP._value_: 20000,
+                    FightProp.FIGHT_PROP_MAX_HP._value_: 20000,
+                    FightProp.FIGHT_PROP_BASE_DEFENSE._value_: 3000,
+                    FightProp.FIGHT_PROP_BASE_ATTACK._value_: 3000,
+                    FightProp.FIGHT_PROP_CRITICAL._value_: 1,
+                    FightProp.FIGHT_PROP_CRITICAL_HURT._value_: 2,
+                    FightProp.FIGHT_PROP_CHARGE_EFFICIENCY._value_: 2,
+                    FightProp.FIGHT_PROP_MAX_ROCK_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_MAX_ICE_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_MAX_WATER_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_MAX_FIRE_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_MAX_ELEC_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_MAX_GRASS_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_MAX_WIND_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_ROCK_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_ICE_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_WATER_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_ELEC_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_FIRE_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_WIND_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_GRASS_ENERGY._value_: 1,
+                    FightProp.FIGHT_PROP_CUR_HP._value_: 20000,
+                    FightProp.FIGHT_PROP_CUR_DEFENSE._value_: 3000,
+                    FightProp.FIGHT_PROP_CUR_ATTACK._value_: 3000,
+                    FightProp.FIGHT_PROP_SPEED_PERCENT._value_: 2,
+            }
+            avatar.fetter_info = AvatarFetterInfo(exp_level=10, exp_number=10)
+            avatar.equip_guid_list = []
+            avatar.proud_skill_extra_level_map = {}
+            avatar.inherent_proud_skill_list = []
+            avatar.skill_level_map = {}
+            avatar.life_state = 1
+            avatar.core_proud_skill_level = 0
+            avatar.guid = self.get_next_guid()
+            self.avatars.append(AvatarEntity(self.world, avatar, self.pos))
+
     def get_cur_avatar(self):
         return self.get_avatar_by_guid(self.cur_avatar_guid)
 
     def get_avatar_by_guid(self, guid: int):
         for avatar_entity in self.avatars: 
             if avatar_entity.guid == guid:
+                return avatar_entity
+
+    def get_avatar_by_entity_id(self, entity_id: int):
+        for avatar_entity in self.avatars: 
+            if avatar_entity.entity_id == entity_id:
                 return avatar_entity
 
     def get_teleport_packet(self, scene_id: int, pos: Vector, enter_type: EnterType = EnterType.ENTER_SELF):

@@ -71,9 +71,6 @@ def handle_scene_init(conn: Connection, msg: SceneInitFinishReq):
     enter_scene_info_notify.cur_avatar_entity_id = cur_avatar.entity_id
     enter_scene_info_notify.team_enter_info = TeamEnterSceneInfo(team_entity_id=conn.player.world.get_next_entity_id(ProtEntityType.PROT_ENTITY_TEAM), team_ability_info=AbilitySyncStateInfo())
     enter_scene_info_notify.mp_level_entity_info = MpLevelEntityInfo(entity_id=conn.player.world.get_next_entity_id(ProtEntityType.PROT_ENTITY_MP_LEVEL), authority_peer_id=1, ability_info=AbilitySyncStateInfo())
-    enter_scene_info_notify.scene_id = conn.player.scene_id
-    enter_scene_info_notify.type = EnterType.ENTER_SELF
-    enter_scene_info_notify.target_uid = conn.player.uid
 
     for avatar_guid in conn.player.teams[conn.player.cur_avatar_team_id].avatar_guid_list:
         avatar = conn.player.get_avatar_by_guid(avatar_guid)
