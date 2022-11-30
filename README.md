@@ -1,6 +1,6 @@
 # saturnine
 
-a work in progress cbt2 server
+a minimal cbt2 ps
 
 # Installation
 1. Install dependencies
