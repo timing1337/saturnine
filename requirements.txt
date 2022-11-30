@@ -51,7 +51,7 @@ keystonemiddleware==10.0.0
 kombu==5.2.4
 loguru==0.6.0
 lxml==4.9.1
-Mako==1.2.1
+Mako==1.2.2
 MarkupSafe==2.1.1
 msgpack==1.0.4
 multidict==6.0.2
