@@ -3,7 +3,12 @@
 a minimal cbt2 ps
 
 # Installation
-
+0. (Optional but recommended) Create a virtual environment
+    ```
+    python -m venv venv
+    venv\Scripts\activate.bat or venv\Scripts\activate.ps1 for PowerShell (Windows)
+    source venv/bin/activate (Linux)
+    ```
 1. Install dependencies
 ```pip install -r ./requirements.txt```
 
@@ -13,7 +18,7 @@ a minimal cbt2 ps
   
     ```git clone https://github.com/lilmayofuksu/pyenet --recursive && cd pyenet```
   
-    Run the setup.py build
+    Compile the ENet Cython module
   
     ```python setup.py build```
   
