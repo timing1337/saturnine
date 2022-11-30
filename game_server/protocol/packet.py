@@ -15,7 +15,7 @@ class Packet:
             self.head = PacketHead()
 
         self.body = body
-        if body:
+        if not body == None:
             self.cmdid = CmdID[body.__class__.__name__]
             self.head.packet_id = self.cmdid
 
@@ -46,7 +46,7 @@ class Packet:
         return self
 
     def __bytes__(self) -> bytes:
-        if not self.body:
+        if self.body == None:
             raise Exception
 
         head_bytes = bytes(self.head)
@@ -61,7 +61,9 @@ class Packet:
         buf.write_u32b(len(body_bytes))
 
         buf.write(head_bytes)
-        buf.write(body_bytes)
+
+        if len(body_bytes) > 0:
+            buf.write(body_bytes)
 
         buf.write_u16b(PACKET_MAGIC[1])
 

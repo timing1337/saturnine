@@ -9,6 +9,7 @@ from game_server.resource import ResourceManager
 from typing import Callable
 import betterproto
 from loguru import logger
+import traceback
 
 class Connection: 
     game_server: GameServer
@@ -75,17 +76,21 @@ class GameServer:
 
     def loop(self) -> None:
         while True:
-            event = self.host.service(20)
-            if event is not None:
-                if event.type == enet.EVENT_TYPE_CONNECT:
-                    self.conns[str(event.peer.address)] = Connection(self, event.peer)
-                elif event.type == enet.EVENT_TYPE_DISCONNECT:
-                    del self.conns[str(event.peer.address)] 
-                elif event.type == enet.EVENT_TYPE_RECEIVE:
-                    msg = event.packet.data
-                    conn = self.conns[str(event.peer.address)]
-                    conn.handle(msg)
+            try:
+                event = self.host.service(20)
+                if event is not None:
+                    if event.type == enet.EVENT_TYPE_CONNECT:
+                        self.conns[str(event.peer.address)] = Connection(self, event.peer)
+                    elif event.type == enet.EVENT_TYPE_DISCONNECT:
+                        del self.conns[str(event.peer.address)]
+                    elif event.type == enet.EVENT_TYPE_RECEIVE:
+                        msg = event.packet.data
+                        conn = self.conns[str(event.peer.address)]
+                        conn.handle(msg)
+            except:
+                traceback.print_exc()
 
     def start(self):
         b = threading.Thread(name='GameServer', target=self.loop)
+        b.daemon=True
         b.start()

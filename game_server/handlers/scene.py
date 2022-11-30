@@ -136,11 +136,12 @@ def handle_scene_done(conn: Connection, msg: EnterSceneDoneReq):
 
     conn.send(scene_entity_appear_notify)
     conn.send(scene_player_location_notify)
-    conn.send_raw(bytes.fromhex("4567011e000300000000089e0289ab"))
+    conn.send(EnterSceneDoneRsp(retcode=0))
 
 @router(CmdID.PostEnterSceneReq)
 def handle_enter_world(conn: Connection, msg: PostEnterSceneReq):
-    conn.send_raw(bytes.fromhex("45670bc900030000000008c91789ab"))
+    conn.send(PostEnterSceneRsp(retcode=0))
+
 
 @router(CmdID.EnterWorldAreaReq)
 def handle_enter_world(conn: Connection, msg: EnterWorldAreaReq):
