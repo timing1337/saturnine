@@ -13,12 +13,9 @@ def handle_PersonalSceneJump(conn: Connection, msg: PersonalSceneJumpReq):
         
     scene_id = point_data[msg.point_id].tranSceneId
     pos = point_data[msg.point_id].tranPos
-    # pos.x += conn.player.pos.x
-    # pos.y += conn.player.pos.y
-    # pos.z += conn.player.pos.z
     
+    conn.player.pos = pos
     
-    #EnterType.ENTER_GOTO    
     player_enter_scene_notify = PlayerEnterSceneNotify()
     player_enter_scene_notify.scene_id = scene_id
     player_enter_scene_notify.pos = pos
@@ -28,14 +25,15 @@ def handle_PersonalSceneJump(conn: Connection, msg: PersonalSceneJumpReq):
     player_enter_scene_notify.world_level = 8
     player_enter_scene_notify.target_uid = conn.player.uid
     player_enter_scene_notify.prev_scene_id = conn.player.scene_id
-    player_enter_scene_notify.prev_pos = conn.player.pos
-    
+    player_enter_scene_notify.prev_pos = conn.player.pos    
     conn.send(player_enter_scene_notify)
     
+    conn.player.scene_id = scene_id
+        
     personal_scene_jump = PersonalSceneJumpRsp()
     personal_scene_jump.retcode = 0
-    personal_scene_jump.dest_scene_id = point_data[msg.point_id].tranSceneId
-    personal_scene_jump.dest_pos = point_data[msg.point_id].tranPos
+    personal_scene_jump.dest_scene_id = scene_id
+    personal_scene_jump.dest_pos = pos
     conn.send(personal_scene_jump)
     
     

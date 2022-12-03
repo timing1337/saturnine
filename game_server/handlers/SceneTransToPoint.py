@@ -14,7 +14,11 @@ def handle_SceneTransToPoint(conn: Connection, msg: SceneTransToPointReq):
     scene_id = point_data[msg.point_id].tranSceneId
     pos = point_data[msg.point_id].tranPos
     
+    conn.player.pos = pos
+    
     conn.send(conn.player.get_teleport_packet(scene_id, pos, EnterType.ENTER_GOTO))
+    
+    conn.player.scene_id = scene_id
 
     scene_trans_to_point_rsp = SceneTransToPointRsp()
     scene_trans_to_point_rsp.retcode = 0

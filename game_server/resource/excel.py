@@ -70,7 +70,7 @@ class TalentSkillData:
 @dataclasses.dataclass()
 class DungeonData:
     id: int = 0             #ID
-    dungeon_id: int = 0     #场景ID
+    scene_id: int = 0     #场景ID
 
 @dataclasses.dataclass()
 class ExcelOutput:

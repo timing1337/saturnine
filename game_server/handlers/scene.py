@@ -123,7 +123,7 @@ def handle_scene_area(conn: Connection, msg: GetSceneAreaReq):
 @router(CmdID.EnterSceneDoneReq)
 def handle_scene_done(conn: Connection, msg: EnterSceneDoneReq):
     cur_avatar = conn.player.get_cur_avatar()
-    
+    conn.player.get_cur_avatar().motion = conn.player.pos
     scene_entity_appear_notify = SceneEntityAppearNotify()
     scene_entity_appear_notify.appear_type = VisionType.VISION_NONE
     scene_entity_appear_notify.entity_list = [cur_avatar.get_scene_entity_info(conn.player.uid)]

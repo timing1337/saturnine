@@ -12,10 +12,14 @@ def handle_PlayerEnterDungeonReq(conn: Connection, msg: PlayerEnterDungeonReq):
     dungeon_data = resources.excels.dungeon_data[msg.dungeon_id]
     point_data = resources.binoutput.config_scene[3].points
     
-    scene_id = dungeon_data.dungeon_id
+    scene_id = dungeon_data.scene_id
     pos = point_data[msg.point_id].tranPos
     
-    conn.send(conn.player.get_teleport_packet(scene_id, pos, EnterType.ENTER_DUNGEON))
+    # conn.player.pos = pos
+    
+    # conn.send(conn.player.get_teleport_packet(scene_id, pos, EnterType.ENTER_DUNGEON))
+    
+    # conn.player.scene_id = scene_id
 
     player_enter_dungeon = PlayerEnterDungeonRsp()
     player_enter_dungeon.retcode = 0
