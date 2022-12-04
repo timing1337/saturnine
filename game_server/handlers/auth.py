@@ -4,6 +4,7 @@ from game_server.encryption import new_key
 from game_server import HandlerRouter,Connection
 from lib.proto import GetPlayerTokenReq,GetPlayerTokenRsp,PlayerLoginReq,PlayerLoginRsp,OpenStateUpdateNotify,StoreWeightLimitNotify,StoreType,PlayerStoreNotify,Vector,PlayerDataNotify,PropValue, AvatarDataNotify
 from game_server.game.player import Player
+from game_server.game.gacha import Gacha
 from game_server.utils.time import current_milli_time
 from game_server.resource.enums import PropType
 import enet
@@ -26,6 +27,7 @@ def handle_token_req(conn: Connection, msg: GetPlayerTokenReq):
     conn.player.scene_id = 3
     conn.player.pos = Vector(100, 400, 100)
     conn.player.init_default()
+    conn.gacha = Gacha()
 
 @router(CmdID.PlayerLoginReq)
 def handle_login(conn: Connection, msg: PlayerLoginReq):
