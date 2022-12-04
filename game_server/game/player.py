@@ -36,6 +36,7 @@ class Player:
             PropType.PROP_MAX_STAMINA: 24000,
             PropType.PROP_PLAYER_LEVEL: 60,
             PropType.PROP_PLAYER_EXP: 0,
+            PropType.PROP_PLAYER_HCOIN: 10,
         }
         self.teams = {
             0: AvatarTeam(avatar_guid_list=[], team_name="Team 1"),
