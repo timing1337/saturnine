@@ -66,6 +66,11 @@ class TalentSkillData:
     id: int = 0              #天赋ID
     talent_group_id: int = 0 #天赋组ID
     rank: int = 0            #等级
+    
+@dataclasses.dataclass()
+class DungeonData:
+    id: int = 0             #ID
+    scene_id: int = 0     #场景ID
 
 @dataclasses.dataclass()
 class ExcelOutput:
@@ -79,6 +84,7 @@ class ExcelOutput:
     #gadget_datas: dict[int, GadgetData] = dataclasses.field(default_factory=dict)
     #monster_datas: dict[int, MonsterData] = dataclasses.field(default_factory=dict)
     #npc_datas: dict[int, NpcData] = dataclasses.field(default_factory=dict)
+    dungeon_data: dict[int, DungeonData] = dataclasses.field(default_factory=dict)
 
     @classmethod
     def load_all_excels(cls, path: str):
@@ -150,5 +156,14 @@ class ExcelOutput:
             for row in reader:
                 talent = None
                 #cls_inst.talent_skill_datas[talent.id] = talent
+        
+        with open(os.path.join(path, "txt", "DungeonData.txt"), encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            for row in reader:
+                dungeon = DungeonData(
+                    int(row["ID"]),
+                    int(row["场景ID"])
+                )
+                cls_inst.dungeon_data[dungeon.id] = dungeon
 
         return cls_inst
