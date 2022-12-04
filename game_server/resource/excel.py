@@ -66,6 +66,11 @@ class TalentSkillData:
     id: int = 0              #天赋ID
     talent_group_id: int = 0 #天赋组ID
     rank: int = 0            #等级
+    
+@dataclasses.dataclass()
+class DungeonData:
+    id: int = 0             #ID
+    scene_id: int = 0     #场景ID
 
 @dataclasses.dataclass()
 class GachaData:                    #GachaNewbieData (actually i wanna use it for another gachas)
@@ -133,10 +138,14 @@ class ExcelOutput:
     #gadget_datas: dict[int, GadgetData] = dataclasses.field(default_factory=dict)
     #monster_datas: dict[int, MonsterData] = dataclasses.field(default_factory=dict)
     #npc_datas: dict[int, NpcData] = dataclasses.field(default_factory=dict)
+
     gacha_datas:dict[int, GachaData] =dataclasses.field(default_factory=dict)
     gacha_prob_datas:dict[(int,GachaItemType), GachaProbData] = dataclasses.field(default_factory=dict)
     gacha_pool_datas:dict[(int,int), GachaPoolData] = dataclasses.field(default_factory=dict) #(gachaId, itemId)
     gacha_rule_datas:dict[int, GachaRuleData] = dataclasses.field(default_factory=dict)
+
+    dungeon_data: dict[int, DungeonData] = dataclasses.field(default_factory=dict)
+
     @classmethod
     def load_all_excels(cls, path: str):
         cls_inst = cls()
@@ -207,6 +216,15 @@ class ExcelOutput:
             for row in reader:
                 talent = None
                 #cls_inst.talent_skill_datas[talent.id] = talent
+        
+        with open(os.path.join(path, "txt", "DungeonData.txt"), encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+            for row in reader:
+                dungeon = DungeonData(
+                    int(row["ID"]),
+                    int(row["场景ID"])
+                )
+                cls_inst.dungeon_data[dungeon.id] = dungeon
 
         with open(os.path.join(path, "txt", "GachaNewbieData.txt"), encoding="utf-8") as f:
             reader = csv.DictReader(f, delimiter="\t")

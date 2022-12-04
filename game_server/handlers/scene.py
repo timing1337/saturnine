@@ -1,7 +1,9 @@
 from game_server.protocol.cmd_id import CmdID
 from game_server import HandlerRouter,Connection
-from lib.proto import TeamEnterSceneInfo, EnterSceneDoneReq, EnterWorldAreaReq,SceneGetAreaExplorePercentReq,SceneGetAreaExplorePercentRsp, EnterWorldAreaRsp, ScenePlayerLocationNotify, PlayerLocationInfo, VisionType, SceneEntityAppearNotify, SceneTeamAvatar, MpDisplayCurAvatar,AvatarEnterSceneInfo, SceneTeamUpdateNotify, ProtEntityType, AbilitySyncStateInfo, MpLevelEntityInfo,EnterSceneReadyReq,EnterScenePeerNotify,SceneInitFinishReq,MpSettingType,WorldDataNotify,PropValue,HostPlayerNotify,PlayerGameTimeNotify,SceneTimeNotify,SceneDataNotify,WorldPlayerInfoNotify,OnlinePlayerInfo,ScenePlayerInfoNotify,ScenePlayerInfo,PlayerEnterSceneInfoNotify,SceneInitFinishRsp,GetScenePointReq, GetSceneAreaReq,GetScenePointRsp,GetSceneAreaRsp,SceneForceUnlockNotify,SceneInitFinishRsp,EnterSceneDoneRsp,EnterType,PostEnterSceneReq,PostEnterSceneRsp
+from lib.proto import TeamEnterSceneInfo, EnterSceneDoneReq, EnterWorldAreaReq,SceneGetAreaExplorePercentReq,SceneGetAreaExplorePercentRsp, EnterWorldAreaRsp, ScenePlayerLocationNotify, PlayerLocationInfo, VisionType, SceneEntityAppearNotify, SceneTeamAvatar, MpDisplayCurAvatar,AvatarEnterSceneInfo, SceneTeamUpdateNotify, ProtEntityType, AbilitySyncStateInfo, MpLevelEntityInfo,EnterSceneReadyReq,EnterScenePeerNotify,SceneInitFinishReq,MpSettingType,WorldDataNotify,PropValue,HostPlayerNotify,PlayerGameTimeNotify,SceneTimeNotify,SceneDataNotify,WorldPlayerInfoNotify,OnlinePlayerInfo,ScenePlayerInfoNotify,ScenePlayerInfo,PlayerEnterSceneInfoNotify,SceneInitFinishRsp,GetScenePointReq, GetSceneAreaReq,GetScenePointRsp,GetSceneAreaRsp,SceneForceUnlockNotify,SceneInitFinishRsp,EnterSceneDoneRsp,EnterType,PostEnterSceneReq,PostEnterSceneRsp, SceneTransToPointReq, SceneTransToPointRsp, DungeonEntryInfoReq, DungeonEntryInfoRsp, DungeonEntryInfo, PersonalSceneJumpReq, PersonalSceneJumpRsp, PlayerEnterDungeonReq, PlayerEnterDungeonRsp, PlayerEnterSceneNotify
 from lib.retcode import Retcode
+from game_server.resource import resources
+from game_server.utils.time import current_milli_time
 from game_server.protocol.reader import BinaryReader
 from game_server.resource.enums import PropType
 import enet
@@ -123,7 +125,7 @@ def handle_scene_area(conn: Connection, msg: GetSceneAreaReq):
 @router(CmdID.EnterSceneDoneReq)
 def handle_scene_done(conn: Connection, msg: EnterSceneDoneReq):
     cur_avatar = conn.player.get_cur_avatar()
-    
+    conn.player.get_cur_avatar().motion = conn.player.pos
     scene_entity_appear_notify = SceneEntityAppearNotify()
     scene_entity_appear_notify.appear_type = VisionType.VISION_NONE
     scene_entity_appear_notify.entity_list = [cur_avatar.get_scene_entity_info(conn.player.uid)]
@@ -156,3 +158,106 @@ def area_explore_percent_handle(conn: Connection, msg: SceneGetAreaExplorePercen
     rsp.area_id = msg.area_id
     rsp.explore_percent = 100
     conn.send(rsp)
+    
+#++
+
+@router(CmdID.SceneTransToPointReq)
+def handle_SceneTransToPoint(conn: Connection, msg: SceneTransToPointReq):
+    if hasattr(resources, 'binoutput'):
+        point_data = resources.binoutput.config_scene[msg.scene_id].points
+        
+        scene_id = point_data[msg.point_id].tranSceneId
+        pos = point_data[msg.point_id].tranPos
+        
+        conn.player.pos = pos
+        
+        conn.send(conn.player.get_teleport_packet(scene_id, pos, EnterType.ENTER_GOTO))
+        
+        conn.player.scene_id = scene_id
+
+        scene_trans_to_point_rsp = SceneTransToPointRsp()
+        scene_trans_to_point_rsp.retcode = 0
+        scene_trans_to_point_rsp.scene_id = msg.scene_id
+        scene_trans_to_point_rsp.point_id = msg.point_id
+        conn.send(scene_trans_to_point_rsp)
+
+@router(CmdID.DungeonEntryInfoReq)
+def handle_DungeonEntryInfo(conn: Connection, msg: DungeonEntryInfoReq):
+    if hasattr(resources, 'binoutput'):
+        point_data = resources.binoutput.config_scene[3].points
+        
+        dungeon_entry_info_rsp = DungeonEntryInfoRsp()
+        dungeon_entry_info_rsp.point_id = msg.point_id
+        
+        dungeon_entry_list = []
+        
+        rec = None
+        
+        for dungeonId in point_data[msg.point_id].dungeonIds:
+            rec = dungeonId
+            dungeon_info = DungeonEntryInfo()
+            dungeon_info.dungeon_id = dungeonId
+            dungeon_info.is_passed = True
+            dungeon_info.left_times = current_milli_time()
+            dungeon_info.start_time = current_milli_time() + 500
+            dungeon_info.end_time = current_milli_time() + 1000
+            dungeon_info.max_boss_chest_num = 2
+            dungeon_info.boss_chest_num = 19000000
+            dungeon_entry_list.append(dungeon_info)
+        
+        dungeon_entry_info_rsp.dungeon_entry_list = dungeon_entry_list
+        dungeon_entry_info_rsp.recommend_dungeon_id = rec
+        
+        conn.send(dungeon_entry_info_rsp)
+
+@router(CmdID.PersonalSceneJumpReq)
+def handle_PersonalSceneJump(conn: Connection, msg: PersonalSceneJumpReq):
+    if hasattr(resources, 'binoutput'):
+        point_data = resources.binoutput.config_scene[conn.player.scene_id].points
+            
+        scene_id = point_data[msg.point_id].tranSceneId
+        pos = point_data[msg.point_id].tranPos
+        
+        conn.player.pos = pos
+        
+        player_enter_scene_notify = PlayerEnterSceneNotify()
+        player_enter_scene_notify.scene_id = scene_id
+        player_enter_scene_notify.pos = pos
+        player_enter_scene_notify.scene_begin_time = current_milli_time()
+        player_enter_scene_notify.type = EnterType.ENTER_JUMP
+        player_enter_scene_notify.enter_scene_token = 1000
+        player_enter_scene_notify.world_level = 8
+        player_enter_scene_notify.target_uid = conn.player.uid
+        player_enter_scene_notify.prev_scene_id = conn.player.scene_id
+        player_enter_scene_notify.prev_pos = conn.player.pos    
+        conn.send(player_enter_scene_notify)
+        
+        conn.player.scene_id = scene_id
+            
+        personal_scene_jump = PersonalSceneJumpRsp()
+        personal_scene_jump.retcode = 0
+        personal_scene_jump.dest_scene_id = scene_id
+        personal_scene_jump.dest_pos = pos
+        conn.send(personal_scene_jump)
+
+
+@router(CmdID.PlayerEnterDungeonReq)
+def handle_PlayerEnterDungeonReq(conn: Connection, msg: PlayerEnterDungeonReq):
+    if hasattr(resources, 'binoutput'):
+        dungeon_data = resources.excels.dungeon_data[msg.dungeon_id]
+        point_data = resources.binoutput.config_scene[3].points
+        
+        scene_id = dungeon_data.scene_id
+        pos = point_data[msg.point_id].tranPos
+        
+        # conn.player.pos = pos
+        
+        # conn.send(conn.player.get_teleport_packet(scene_id, pos, EnterType.ENTER_DUNGEON))
+        
+        # conn.player.scene_id = scene_id
+
+        player_enter_dungeon = PlayerEnterDungeonRsp()
+        player_enter_dungeon.retcode = 0
+        player_enter_dungeon.point_id = msg.point_id
+        player_enter_dungeon.dungeon_id = msg.dungeon_id
+        conn.send(player_enter_dungeon)

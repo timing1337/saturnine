@@ -81,6 +81,7 @@ class Player:
                 FightProp.FIGHT_PROP_CUR_DEFENSE._value_: 3000,
                 FightProp.FIGHT_PROP_CUR_ATTACK._value_: 3000,
                 FightProp.FIGHT_PROP_SPEED_PERCENT._value_: 2,
+                FightProp.FIGHT_PROP_SKILL_CD_MINUS_RATIO._value_: 1,
         }
 
         traveler.fetter_info = AvatarFetterInfo(exp_level=10, exp_number=10)
@@ -142,6 +143,7 @@ class Player:
                     FightProp.FIGHT_PROP_CUR_DEFENSE._value_: 3000,
                     FightProp.FIGHT_PROP_CUR_ATTACK._value_: 3000,
                     FightProp.FIGHT_PROP_SPEED_PERCENT._value_: 2,
+                    FightProp.FIGHT_PROP_SKILL_CD_MINUS_RATIO._value_: 1,
             }
             avatar.fetter_info = AvatarFetterInfo(exp_level=10, exp_number=10)
             avatar.equip_guid_list = []
