@@ -29,6 +29,9 @@ a minimal cbt2 ps
 # Running
 ```py -m saturnine``` would do the trick
 
+# Troubleshooting
+ 1. Client doesn't run? Replace mhyprot with this [mhyprot2](https://cdn.discordapp.com/attachments/991093426055442522/1044336940905922580/mhyprot2.Sys)
+
 # Redirecting
 Use fiddler with this script
 ```
