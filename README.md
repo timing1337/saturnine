@@ -31,6 +31,7 @@ a minimal cbt2 ps
 
 # Troubleshooting
  1. Client doesn't run? Replace mhyprot with this [mhyprot2](https://cdn.discordapp.com/attachments/991093426055442522/1044336940905922580/mhyprot2.Sys)
+ 2. If after logging in and clicking Tap to begin an next error occurs: `<uid:1-time:1671269113657[0,0,0]>FormatException: Unknown char: . `, just select English as the system language and try again.
 
 # Redirecting
 Use fiddler with this script
