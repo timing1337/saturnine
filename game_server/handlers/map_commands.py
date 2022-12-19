@@ -1,7 +1,7 @@
 from game_server.protocol.cmd_id import CmdID
 from game_server.utils.time import current_milli_time
 from game_server import HandlerRouter,Connection
-from lib.proto import MarkMapReq, PlayerEnterSceneNotify ,Vector ,EnterType
+from lib.proto import MarkMapReq, PlayerEnterSceneNotify ,CutSceneBeginNotify ,Vector ,EnterType
 import enet
 
 router = HandlerRouter()
@@ -38,6 +38,20 @@ def handle_map_tp(conn: Connection, msg: MarkMapReq):
             conn.player.pos = pos
             conn.player.scene_id = scene_id
             conn.player.get_cur_avatar().motion = pos
+        elif msg.mark:
+            if msg.mark.point_type == 3:
+                global cg_id
+                cg_id = 1
+            if msg.mark.name:
+                try:
+                    cg_id = int(msg.mark.name)
+                except:
+                    pass
+
+            playcg = CutSceneBeginNotify()
+            playcg.cutscene_id = cg_id
+            playcg.is_wait_others = 0
+            conn.send(playcg)
         else:
             pass
             
