@@ -1,4 +1,9 @@
+## DEPRECATED
+Please move to [this](https://github.com/NickTheHuy/CockPY) for future updates.
+
+
 # saturnine
+
 
 a minimal cbt2 ps
 
